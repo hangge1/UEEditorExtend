@@ -67,10 +67,19 @@ void UQuickAssetAction::AddPrefixes()
 			continue;
 		}
 
+		if (currentAsset->IsA<UMaterialInstanceConstant>())
+		{
+			OldName.RemoveFromStart(TEXT("M_"));
+			OldName.RemoveFromEnd(TEXT("_Inst"));
+		}
+
 		const FString NewNameWithPrefix = *PrefixFound + OldName;
 		UEditorUtilityLibrary::RenameAsset(currentAsset, NewNameWithPrefix);
 
 		Counter++;
+
+
+
 	}
 
 	ShowNotifyInfo(TEXT("Successfully renamed " + FString::FromInt(Counter) + " Assets!"));

@@ -43,6 +43,7 @@ private:
 		{ UStaticMesh::StaticClass(), TEXT("SM_") },
 		{ UMaterial::StaticClass(), TEXT("M_") },
 		{ UMaterialInstance::StaticClass(), TEXT("ML_") },
+		{ UMaterialInstanceConstant::StaticClass(), TEXT("ML_") },
 		{ UMaterialFunctionInterface::StaticClass(), TEXT("MF_") },
 		{ UParticleSystem::StaticClass(), TEXT("PS_") },
 		{ USoundCue::StaticClass(), TEXT("SC_") },
