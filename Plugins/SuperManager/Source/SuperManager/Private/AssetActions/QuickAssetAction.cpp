@@ -7,6 +7,8 @@
 #include "EditorAssetLibrary.h"
 #include "Misc/MessageDialog.h"
 #include "ObjectTools.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetToolsModule.h"
 
 void UQuickAssetAction::DuplicateAssets(int32 NumOfDuplicates)
 {
@@ -76,9 +78,6 @@ void UQuickAssetAction::AddPrefixes()
 		UEditorUtilityLibrary::RenameAsset(currentAsset, NewNameWithPrefix);
 
 		Counter++;
-
-
-
 	}
 
 	ShowNotifyInfo(TEXT("Successfully renamed " + FString::FromInt(Counter) + " Assets!"));
@@ -89,6 +88,7 @@ void UQuickAssetAction::RemoveUnusedAssets()
 	TArray<FAssetData> SeletedAssetsData = UEditorUtilityLibrary::GetSelectedAssetData();
 	TArray<FAssetData> UnusedAssetsData;
 
+	FixUpRedirectors();
 	for (const FAssetData& CurrentAssetData : SeletedAssetsData)
 	{
 		TArray<FString> AssetReferences = UEditorAssetLibrary::FindPackageReferencersForAsset(CurrentAssetData.ObjectPath.ToString(), true);
@@ -108,4 +108,33 @@ void UQuickAssetAction::RemoveUnusedAssets()
 	if (NumOfAssetsDeleted == 0) return;
 
 	ShowNotifyInfo(TEXT("Successfully Deleted " + FString::FromInt(NumOfAssetsDeleted) + " Unused Assets"));
+}
+
+void UQuickAssetAction::FixUpRedirectors()
+{
+	FAssetRegistryModule& AssetRegistryModule = 
+	FModuleManager::Get().LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
+
+	FARFilter Filter;
+	Filter.bRecursivePaths = true;
+	Filter.bRecursiveClasses = true;
+	Filter.PackagePaths.Emplace("/Game");
+	Filter.ClassPaths.Add(UObjectRedirector::StaticClass()->GetClassPathName());
+
+	TArray<FAssetData> OutRedirectors;
+	AssetRegistryModule.Get().GetAssets(Filter, OutRedirectors);
+
+	TArray<UObjectRedirector*> RedirectorsToFixArray;
+	for (const FAssetData& RedirectorData : OutRedirectors)
+	{
+		if (UObjectRedirector* RedirectorToFix = Cast<UObjectRedirector>(RedirectorData.GetAsset()))
+		{
+			RedirectorsToFixArray.Add(RedirectorToFix);
+		}
+	}
+
+	FAssetToolsModule& AssetToolsModule =
+		FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
+
+	AssetToolsModule.Get().FixupReferencers(RedirectorsToFixArray);
 }
