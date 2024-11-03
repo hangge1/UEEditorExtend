@@ -23,9 +23,9 @@ void UQuickAssetAction::DuplicateAssets(int32 NumOfDuplicates)
 
 	for (const FAssetData& CurrentAssetData : SeletedAssetsData)
 	{
-		for (int32 i = 0; i < NumOfDuplicates; i++)
+		for (int32 i = 0; i < NumOfDuplicates; i++) 
 		{
-			const FString SourceAssetPath = CurrentAssetData.ObjectPath.ToString();
+			const FString SourceAssetPath = CurrentAssetData.GetSoftObjectPath().ToString();
 			const FString NewDuplicatedAssetName = CurrentAssetData.AssetName.ToString() + TEXT("_") + FString::FromInt(i + 1);
 			const FString NewPathName = FPaths::Combine(CurrentAssetData.PackagePath.ToString(), NewDuplicatedAssetName);
 
@@ -91,7 +91,7 @@ void UQuickAssetAction::RemoveUnusedAssets()
 	FixUpRedirectors();
 	for (const FAssetData& CurrentAssetData : SeletedAssetsData)
 	{
-		TArray<FString> AssetReferences = UEditorAssetLibrary::FindPackageReferencersForAsset(CurrentAssetData.ObjectPath.ToString(), true);
+		TArray<FString> AssetReferences = UEditorAssetLibrary::FindPackageReferencersForAsset(CurrentAssetData.GetSoftObjectPath().ToString(), true);
 		if (AssetReferences.IsEmpty())
 		{
 			UnusedAssetsData.Add(CurrentAssetData);
