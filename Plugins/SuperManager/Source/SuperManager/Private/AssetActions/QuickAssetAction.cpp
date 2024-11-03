@@ -3,11 +3,10 @@
 
 #include "AssetActions/QuickAssetAction.h"
 #include "DebugHeader.h"
-
 #include "EditorUtilityLibrary.h"
 #include "EditorAssetLibrary.h"
-
 #include "Misc/MessageDialog.h"
+#include "ObjectTools.h"
 
 void UQuickAssetAction::DuplicateAssets(int32 NumOfDuplicates)
 {
@@ -83,4 +82,30 @@ void UQuickAssetAction::AddPrefixes()
 	}
 
 	ShowNotifyInfo(TEXT("Successfully renamed " + FString::FromInt(Counter) + " Assets!"));
+}
+
+void UQuickAssetAction::RemoveUnusedAssets()
+{
+	TArray<FAssetData> SeletedAssetsData = UEditorUtilityLibrary::GetSelectedAssetData();
+	TArray<FAssetData> UnusedAssetsData;
+
+	for (const FAssetData& CurrentAssetData : SeletedAssetsData)
+	{
+		TArray<FString> AssetReferences = UEditorAssetLibrary::FindPackageReferencersForAsset(CurrentAssetData.ObjectPath.ToString(), true);
+		if (AssetReferences.IsEmpty())
+		{
+			UnusedAssetsData.Add(CurrentAssetData);
+		}
+	}
+
+	if (UnusedAssetsData.Num() == 0)
+	{
+		ShowNotifyInfo(TEXT("No Unused Assets found among selected assets"));
+		return;
+	}
+
+	int32 NumOfAssetsDeleted = ObjectTools::DeleteAssets(UnusedAssetsData);
+	if (NumOfAssetsDeleted == 0) return;
+
+	ShowNotifyInfo(TEXT("Successfully Deleted " + FString::FromInt(NumOfAssetsDeleted) + " Unused Assets"));
 }
