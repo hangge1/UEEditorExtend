@@ -5,6 +5,8 @@
 #include "DebugHeader.h"
 #include "EditorAssetLibrary.h"
 #include "ObjectTools.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetToolsModule.h"
 
 #define LOCTEXT_NAMESPACE "FSuperManagerModule"
 
@@ -87,6 +89,8 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 
 	if (ConfirmResult != EAppReturnType::Yes) return;
 
+	FixUpRedirectors();
+
 	TArray<FAssetData> UnusedAssetsDataArray;
 	for (const FString& AssetPathName : AssetsPathNames)
 	{
@@ -110,6 +114,35 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 	{
 		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused asset found under selected folder!"));
 	}
+}
+
+void FSuperManagerModule::FixUpRedirectors()
+{
+	FAssetRegistryModule& AssetRegistryModule =
+	FModuleManager::Get().LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
+
+	FARFilter Filter;
+	Filter.bRecursivePaths = true;
+	Filter.bRecursiveClasses = true;
+	Filter.PackagePaths.Emplace("/Game");
+	Filter.ClassPaths.Add(UObjectRedirector::StaticClass()->GetClassPathName());
+
+	TArray<FAssetData> OutRedirectors;
+	AssetRegistryModule.Get().GetAssets(Filter, OutRedirectors);
+
+	TArray<UObjectRedirector*> RedirectorsToFixArray;
+	for (const FAssetData& RedirectorData : OutRedirectors)
+	{
+		if (UObjectRedirector* RedirectorToFix = Cast<UObjectRedirector>(RedirectorData.GetAsset()))
+		{
+			RedirectorsToFixArray.Add(RedirectorToFix);
+		}
+	}
+
+	FAssetToolsModule& AssetToolsModule =
+	FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
+
+	AssetToolsModule.Get().FixupReferencers(RedirectorsToFixArray);
 }
 
 #pragma endregion
