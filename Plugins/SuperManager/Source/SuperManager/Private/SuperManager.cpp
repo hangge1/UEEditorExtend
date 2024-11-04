@@ -50,7 +50,9 @@ TSharedRef<FExtender> FSuperManagerModule::CustomCBMenuExtender(const TArray<FSt
 	{
 		FolderPathSelected = SelectedPaths;
 
-		MenuExtender->AddMenuExtension(FName("Delete"), EExtensionHook::After, TSharedPtr<FUICommandList>(),
+		MenuExtender->AddMenuExtension(FName("Delete"),  //Extension Hook, Key
+			EExtensionHook::After, //Inseting before or after
+			TSharedPtr<FUICommandList>(), //Custom hot keys
 			FMenuExtensionDelegate::CreateRaw(this, &FSuperManagerModule::AddCBMenuEntry));
 	}
 
@@ -60,10 +62,10 @@ TSharedRef<FExtender> FSuperManagerModule::CustomCBMenuExtender(const TArray<FSt
 void FSuperManagerModule::AddCBMenuEntry(FMenuBuilder& MenuBuilder)
 {
 	MenuBuilder.AddMenuEntry(
-		FText::FromString(TEXT("Delete Unused Assets")),
-		FText::FromString(TEXT("Safely Delete All unused assets under folder")),
-		FSlateIcon(),
-		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteUnusedAssetButtonClicked)
+		FText::FromString(TEXT("Delete Unused Assets")), //Title
+		FText::FromString(TEXT("Safely Delete All unused assets under folder")), //Tooltip
+		FSlateIcon(), //Icon
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteUnusedAssetButtonClicked) //actual function to execute
 	);
 }
 
@@ -75,8 +77,6 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 		return;
 	}
 
-	DebugHeader::Print(TEXT("Currently selected folder: ") + FolderPathSelected[0], FColor::Green);
-
 	TArray<FString> AssetsPathNames = UEditorAssetLibrary::ListAssets(FolderPathSelected[0]);
 	if (AssetsPathNames.Num() == 0)
 	{
@@ -85,21 +85,29 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 	}
 	
 	EAppReturnType::Type ConfirmResult = 
-	DebugHeader::ShowMsgDialog(EAppMsgType::YesNo, TEXT("A total of ") + FString::FromInt(AssetsPathNames.Num()) + TEXT(" found.\nWould you like to process?"));;
+	DebugHeader::ShowMsgDialog(EAppMsgType::YesNo, TEXT("A total of ") + 
+		FString::FromInt(AssetsPathNames.Num()) + TEXT("Assets need to be checked.\nWould you like to process?"), false);;
 
-	if (ConfirmResult != EAppReturnType::Yes) return;
+	if (ConfirmResult != EAppReturnType::Yes) 
+		return;
 
 	FixUpRedirectors();
 
 	TArray<FAssetData> UnusedAssetsDataArray;
 	for (const FString& AssetPathName : AssetsPathNames)
 	{
-		if (AssetPathName.Contains(TEXT("Developers")) || AssetPathName.Contains(TEXT("Collections"))) continue;
-		if (!UEditorAssetLibrary::DoesAssetExist(AssetPathName)) continue;
+		if (AssetPathName.Contains(TEXT("Developers")) ||
+			AssetPathName.Contains(TEXT("Collections")) ||
+			AssetPathName.Contains(TEXT("__ExternalActors__")) ||
+			AssetPathName.Contains(TEXT("__ExternalObjects__")))
+		{
+			continue;
+		}
 
-		TArray<FString> AssetReferencers =
-		UEditorAssetLibrary::FindPackageReferencersForAsset(AssetPathName);
+		if (!UEditorAssetLibrary::DoesAssetExist(AssetPathName)) 
+			continue;
 
+		TArray<FString> AssetReferencers = UEditorAssetLibrary::FindPackageReferencersForAsset(AssetPathName);
 		if (AssetReferencers.Num() == 0)
 		{
 			UnusedAssetsDataArray.Add(UEditorAssetLibrary::FindAssetData(AssetPathName));
@@ -112,7 +120,7 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 	}
 	else
 	{
-		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused asset found under selected folder!"));
+		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused asset found under selected folder!"), false);
 	}
 }
 
