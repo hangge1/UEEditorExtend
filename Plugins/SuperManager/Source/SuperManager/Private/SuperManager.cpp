@@ -27,10 +27,12 @@ void FSuperManagerModule::ShutdownModule()
 
 void FSuperManagerModule::RegisterAdvanceDeletionTab()
 {
-	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FName("AdvanceDeletion"),
-		FOnSpawnTab::CreateRaw(this, &FSuperManagerModule::OnSpawnAdvanceDeletionTab))
-		.SetDisplayName(FText::FromString(TEXT("Advance Deletion")));
+	FTabSpawnerEntry& TabSpawnerEntry = FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
+		FName("AdvanceDeletion"),
+		FOnSpawnTab::CreateRaw(this, &FSuperManagerModule::OnSpawnAdvanceDeletionTab)
+	);
 
+	TabSpawnerEntry.SetDisplayName(FText::FromString(TEXT("Advance Deletion")));
 }
 
 TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvanceDeletionTab(const FSpawnTabArgs& SpawnTabArgs)
