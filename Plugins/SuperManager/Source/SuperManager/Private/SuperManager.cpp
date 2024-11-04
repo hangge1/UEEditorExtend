@@ -42,9 +42,34 @@ TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvanceDeletionTab(const FSpawn
 	SNew(SDockTab).TabRole(ETabRole::NomadTab)
 	[
 		SNew(SAdvanceDeletionTab)
-			.TestString(TEXT("I am passing data"))
-
+        .AssetsDataToStore(GetAllAssetDataUnderSeletedFolder())
 	];
+}
+
+TArray<TSharedPtr<FAssetData>> FSuperManagerModule::GetAllAssetDataUnderSeletedFolder()
+{
+    TArray<TSharedPtr<FAssetData>> AvaibleAssetsData;
+
+    TArray<FString> AssetPathNameArray = UEditorAssetLibrary::ListAssets(FolderPathSelected[0]);
+
+    for( const FString& AssetPathName : AssetPathNameArray )
+    {
+        if( AssetPathName.Contains(TEXT("Developers")) ||
+           AssetPathName.Contains(TEXT("Collections")) ||
+           AssetPathName.Contains(TEXT("__ExternalActors__")) ||
+           AssetPathName.Contains(TEXT("__ExternalObjects__")) )
+        {
+            continue;
+        }
+
+        if( !UEditorAssetLibrary::DoesAssetExist(AssetPathName) )
+            continue;
+
+        const FAssetData Data = UEditorAssetLibrary::FindAssetData(AssetPathName);
+        AvaibleAssetsData.Add(MakeShared<FAssetData>(Data));
+    }
+
+    return AvaibleAssetsData;
 }
 
 #pragma endregion
