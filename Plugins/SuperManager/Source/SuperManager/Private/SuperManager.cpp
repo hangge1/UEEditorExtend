@@ -13,6 +13,8 @@
 void FSuperManagerModule::StartupModule()
 {
 	InitCBMenuExtention();
+
+	RegisterAdvanceDeletionTab();
 }
 
 void FSuperManagerModule::ShutdownModule()
@@ -20,6 +22,24 @@ void FSuperManagerModule::ShutdownModule()
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
 }
+
+#pragma region CustomEditorTab
+
+void FSuperManagerModule::RegisterAdvanceDeletionTab()
+{
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FName("AdvanceDeletion"),
+		FOnSpawnTab::CreateRaw(this, &FSuperManagerModule::OnSpawnAdvanceDeletionTab))
+		.SetDisplayName(FText::FromString(TEXT("Advance Deletion")));
+
+}
+
+TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvanceDeletionTab(const FSpawnTabArgs& SpawnTabArgs)
+{
+	return
+	SNew(SDockTab).TabRole(ETabRole::NomadTab);
+}
+
+#pragma endregion
 
 #pragma region ContentBrowerMenuExtention
 
@@ -74,6 +94,14 @@ void FSuperManagerModule::AddCBMenuEntry(FMenuBuilder& MenuBuilder)
 		FSlateIcon(), //Icon
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteEmptyFoldersButtonClicked) 
 	);
+
+	MenuBuilder.AddMenuEntry(
+		FText::FromString(TEXT("Advance Deletetion")),
+		FText::FromString(TEXT("List assets by specific condition in a tab deleting")),
+		FSlateIcon(), //Icon
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnAdvanceDeletionButtonClicked)
+	);
+
 }
 
 void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
@@ -191,6 +219,11 @@ void FSuperManagerModule::OnDeleteEmptyFoldersButtonClicked()
 		DebugHeader::ShowNotifyInfo(TEXT("Sucessfully Delete ") + FString::FromInt(Counter) + " Empty Folders!");
 	}
 	
+}
+
+void FSuperManagerModule::OnAdvanceDeletionButtonClicked()
+{
+	FGlobalTabmanager::Get()->TryInvokeTab(FName("AdvanceDeletion"));
 }
 
 void FSuperManagerModule::FixUpRedirectors()
