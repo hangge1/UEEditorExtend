@@ -290,6 +290,19 @@ void FSuperManagerModule::FixUpRedirectors()
 
 #pragma endregion
 
+
+#pragma region ProcessDataForAdvanceDeletionTab
+
+bool FSuperManagerModule::DeleteSingleAssetForAssetList(const FAssetData& AssetDataToDelete)
+{
+    TArray<FAssetData> AssetDataForDeletion;
+    AssetDataForDeletion.Add(AssetDataToDelete);
+
+    return ObjectTools::DeleteAssets(AssetDataForDeletion) > 0;
+}
+
+#pragma endregion
+
 #undef LOCTEXT_NAMESPACE
 	
 IMPLEMENT_MODULE(FSuperManagerModule, SuperManager)
