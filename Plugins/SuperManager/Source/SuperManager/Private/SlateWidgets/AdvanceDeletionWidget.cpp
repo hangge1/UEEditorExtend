@@ -76,7 +76,7 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(
     AssetNameFont.Size = 15;
 
     TSharedRef<STableRow<TSharedPtr<FAssetData>>> RowWidget = 
-    SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable)
+    SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable).Padding(FMargin(5.f))
     [
         SNew(SHorizontalBox)
 
@@ -91,9 +91,9 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(
 
         // Second Slot for displaying asset class name
         + SHorizontalBox::Slot()
-        .HAlign(HAlign_Left)
+        .HAlign(HAlign_Center)
         .VAlign(VAlign_Fill)
-        .FillWidth(0.2f)
+        .FillWidth(0.55f)
         [
             ConstructTextForRowWidget(DisplayAssetClassName, AssetClassNameFont)
         ]
@@ -102,13 +102,17 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(
         + SHorizontalBox::Slot()
         .HAlign(HAlign_Left)
         .VAlign(VAlign_Fill)
-        .FillWidth(0.2f)
         [
             ConstructTextForRowWidget(DisplayAssetName, AssetNameFont)
         ]
 
         // Third Slot for a button
-
+        + SHorizontalBox::Slot()
+        .HAlign(HAlign_Right)
+        .VAlign(VAlign_Fill)
+        [
+            ConstructButtonForRowWidget(AssetDataToDisplay)
+        ]
     ];
 
     return RowWidget;
@@ -152,4 +156,20 @@ TSharedRef<STextBlock> SAdvanceDeletionTab::ConstructTextForRowWidget(const FStr
     .ColorAndOpacity(FColor::White);
 
     return ConstructTextBlock;
+}
+
+TSharedRef<SButton> SAdvanceDeletionTab::ConstructButtonForRowWidget(const TSharedPtr<FAssetData>& AssetDataToDisplay)
+{
+    TSharedRef<SButton> ConstructButton = SNew(SButton)
+    .Text(FText::FromString(TEXT("Delete")))
+    .OnClicked(this, &SAdvanceDeletionTab::OnDeleteButtonClicked, AssetDataToDisplay);
+
+    return ConstructButton;
+}
+
+FReply SAdvanceDeletionTab::OnDeleteButtonClicked(TSharedPtr<FAssetData> AssetDataToDisplay)
+{
+    DebugHeader::Print(AssetDataToDisplay->AssetName.ToString() + TEXT(" is clicked"), FColor::Green);
+
+    return FReply::Handled();
 }
