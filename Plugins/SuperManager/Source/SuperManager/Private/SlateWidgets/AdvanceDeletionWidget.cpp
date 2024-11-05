@@ -94,6 +94,8 @@ TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionTab::ConstructAsse
 
 void SAdvanceDeletionTab::RefreshAssetListView()
 {
+    AssetsDataToDeleteArray.Empty();
+
     if(AssetListView.IsValid())
     {
         AssetListView->RebuildList();
@@ -176,9 +178,14 @@ void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TShare
     {
     case ECheckBoxState::Checked:
         DebugHeader::Print(AssetData->AssetName.ToString() + TEXT("Is Checked"), FColor::Blue);
+        AssetsDataToDeleteArray.AddUnique(AssetData);
         break;
     case ECheckBoxState::Unchecked:
         DebugHeader::Print(AssetData->AssetName.ToString() + TEXT("Is Unchecked"), FColor::Blue);
+        if(AssetsDataToDeleteArray.Contains(AssetData))
+        {
+            AssetsDataToDeleteArray.Remove(AssetData);
+        }
         break;
     case ECheckBoxState::Undetermined:
         DebugHeader::Print(AssetData->AssetName.ToString() + TEXT("Is Undetermined"), FColor::Blue);
@@ -244,7 +251,36 @@ TSharedRef<SButton> SAdvanceDeletionTab::COnstructDeleteAllButton()
 
 FReply SAdvanceDeletionTab::OnDeleteAllButtonClicked()
 {
-    DebugHeader::Print(TEXT("Delete All!"), FColor::Green);
+    if(AssetsDataToDeleteArray.Num() == 0)
+    {
+        DebugHeader::ShowMsgDialog(EAppMsgType::Ok,TEXT("No Asset Currently Selected!"));
+        return FReply::Handled();
+    }
+
+    TArray<FAssetData> AssetDataToDelete;
+
+    for (const TSharedPtr<FAssetData>& Data : AssetsDataToDeleteArray)
+    {
+        AssetDataToDelete.Add(*Data);
+    }
+    //Pass data to out module for deletetion
+    FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>(TEXT("SuperManager"));
+    
+    const bool bAssetDeleted = SuperManagerModule.DeleteMultipleAssetsForAssetList(AssetDataToDelete);
+    if(bAssetDeleted)
+    {
+        for (const TSharedPtr<FAssetData>& DeletedData : AssetsDataToDeleteArray)
+        {
+            if(StoredAssetData.Contains(DeletedData))
+            {
+                StoredAssetData.Remove(DeletedData);
+            }
+        }
+
+        RefreshAssetListView();
+    }
+
+
     return FReply::Handled();
 }
 
