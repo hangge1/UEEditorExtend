@@ -21,6 +21,8 @@ private:
     TSharedRef<SListView<TSharedPtr<FAssetData>>> ConstructAssetListView();
     TSharedPtr<SListView<TSharedPtr<FAssetData>>> AssetListView;
 
+#pragma region RowWidgetForAssetListView
+
     //Row Widget
     TSharedRef<ITableRow> OnGenerateRowForList(TSharedPtr<FAssetData> AssetDataToDisplay, const TSharedRef<STableViewBase>& OwnerTable);
 
@@ -34,6 +36,19 @@ private:
     //Button in Row
     TSharedRef<SButton> ConstructButtonForRowWidget(const TSharedPtr<FAssetData>& AssetDataToDisplay);
     FReply OnDeleteButtonClicked(TSharedPtr<FAssetData> AssetDataToDisplay);
+
+#pragma endregion
+
+    TSharedRef<SButton> COnstructDeleteAllButton();
+    FReply OnDeleteAllButtonClicked();
+
+    TSharedRef<SButton> COnstructSelectAllButton();
+    FReply OnSelectAllButtonClicked();
+
+    TSharedRef<SButton> COnstructDeSelectAllButton();
+    FReply OnDeSelectAllButtonClicked();
+
+    TSharedRef<STextBlock> ConstructTextForTabButtons(const FString& TextContent);
 
     FSlateFontInfo GetEmboseedTextFont() const { return FCoreStyle::Get().GetFontStyle(FName("EmbossedText")); }
 };

@@ -54,6 +54,30 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
         .AutoHeight()
         [
             SNew(SHorizontalBox)
+            
+            //Button Delete All
+            +SHorizontalBox::Slot()
+            .FillWidth(10.f)
+            .Padding(5.f)
+            [
+                COnstructDeleteAllButton()
+            ]
+
+            //Button Select All
+            + SHorizontalBox::Slot()
+            .FillWidth(10.f)
+            .Padding(5.f)
+            [
+                COnstructSelectAllButton()
+            ]
+
+            //Button DeSelect All
+            + SHorizontalBox::Slot()
+            .FillWidth(10.f)
+            .Padding(5.f)
+            [
+                COnstructDeSelectAllButton()
+            ]
         ]
 	];
 }
@@ -76,6 +100,8 @@ void SAdvanceDeletionTab::RefreshAssetListView()
     }
 
 }
+
+#pragma region RowWidgetForAssetListView
 
 TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(
     TSharedPtr<FAssetData> AssetDataToDisplay, const TSharedRef<STableViewBase>& OwnerTable)
@@ -203,3 +229,73 @@ FReply SAdvanceDeletionTab::OnDeleteButtonClicked(TSharedPtr<FAssetData> Clicked
 
     return FReply::Handled();
 }
+
+TSharedRef<SButton> SAdvanceDeletionTab::COnstructDeleteAllButton()
+{
+    TSharedRef<SButton> DeleteAllButton = SNew(SButton)
+    .ContentPadding(FMargin(5.f))
+    .OnClicked(this, &SAdvanceDeletionTab::OnDeleteAllButtonClicked)
+    [
+        ConstructTextForTabButtons(TEXT("Delete All"))
+    ];
+
+    return DeleteAllButton;
+}
+
+FReply SAdvanceDeletionTab::OnDeleteAllButtonClicked()
+{
+    DebugHeader::Print(TEXT("Delete All!"), FColor::Green);
+    return FReply::Handled();
+}
+
+TSharedRef<SButton> SAdvanceDeletionTab::COnstructSelectAllButton()
+{
+    TSharedRef<SButton> SelectAllButton = SNew(SButton)
+        .ContentPadding(FMargin(5.f))
+        .OnClicked(this, &SAdvanceDeletionTab::OnSelectAllButtonClicked)
+        [
+            ConstructTextForTabButtons(TEXT("Select All"))
+        ];
+
+    return SelectAllButton;
+}
+
+FReply SAdvanceDeletionTab::OnSelectAllButtonClicked()
+{
+    DebugHeader::Print(TEXT("Select All!"), FColor::Green);
+    return FReply::Handled();
+}
+
+TSharedRef<SButton> SAdvanceDeletionTab::COnstructDeSelectAllButton()
+{
+    TSharedRef<SButton> UnSelectAllButton = 
+        SNew(SButton)
+        .ContentPadding(FMargin(5.f))
+        .OnClicked(this, &SAdvanceDeletionTab::OnDeSelectAllButtonClicked)
+        [
+            ConstructTextForTabButtons(TEXT("DeSelect All"))
+        ];
+
+    return UnSelectAllButton;
+}
+
+FReply SAdvanceDeletionTab::OnDeSelectAllButtonClicked()
+{
+    DebugHeader::Print(TEXT("DeSelect All!"), FColor::Green);
+    return FReply::Handled();
+}
+
+TSharedRef<STextBlock> SAdvanceDeletionTab::ConstructTextForTabButtons(const FString& TextContent)
+{
+    FSlateFontInfo ButtonTextFont = GetEmboseedTextFont();
+    ButtonTextFont.Size = 15;
+
+    TSharedRef<STextBlock> TextBlock = SNew(STextBlock)
+        .Text(FText::FromString(TextContent))
+        .Font(ButtonTextFont)
+        .Justification(ETextJustify::Center);
+
+    return TextBlock;
+}
+
+#pragma endregion
