@@ -67,7 +67,13 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(
     if(!AssetDataToDisplay.IsValid()) 
         return SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable);
 
+    const FString DisplayAssetClassName = AssetDataToDisplay->AssetClassPath.GetAssetName().ToString();
+    FSlateFontInfo AssetClassNameFont = GetEmboseedTextFont();
+    AssetClassNameFont.Size = 10;
+
     const FString DisplayAssetName = AssetDataToDisplay->AssetName.ToString();
+    FSlateFontInfo AssetNameFont = GetEmboseedTextFont();
+    AssetNameFont.Size = 15;
 
     TSharedRef<STableRow<TSharedPtr<FAssetData>>> RowWidget = 
     SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable)
@@ -85,14 +91,24 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(
 
         // Second Slot for displaying asset class name
         + SHorizontalBox::Slot()
+        .HAlign(HAlign_Left)
+        .VAlign(VAlign_Fill)
+        .FillWidth(0.2f)
         [
-            SNew(STextBlock)
-                .Text(FText::FromString(DisplayAssetName))
+            ConstructTextForRowWidget(DisplayAssetClassName, AssetClassNameFont)
         ]
 
         // Third Slot for displaying asset name
-         
+        + SHorizontalBox::Slot()
+        .HAlign(HAlign_Left)
+        .VAlign(VAlign_Fill)
+        .FillWidth(0.2f)
+        [
+            ConstructTextForRowWidget(DisplayAssetName, AssetNameFont)
+        ]
+
         // Third Slot for a button
+
     ];
 
     return RowWidget;
@@ -100,12 +116,12 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(
 
 TSharedRef<SCheckBox> SAdvanceDeletionTab::ConstructCheckBox(const TSharedPtr<FAssetData>& AssetDataToDisplay)
 {
-    TSharedRef<SCheckBox> Result = SNew(SCheckBox)
+    TSharedRef<SCheckBox> ConstructCheckBox = SNew(SCheckBox)
     .Type(ESlateCheckBoxType::CheckBox)
     .OnCheckStateChanged(this, &SAdvanceDeletionTab::OnCheckBoxStateChanged, AssetDataToDisplay)
     .Visibility(EVisibility::Visible);
 
-    return Result;
+    return ConstructCheckBox;
 }
 
 void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TSharedPtr<FAssetData> AssetData)
@@ -126,4 +142,14 @@ void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TShare
     }
 
     
+}
+
+TSharedRef<STextBlock> SAdvanceDeletionTab::ConstructTextForRowWidget(const FString& TextContent, const FSlateFontInfo& FontToUse)
+{
+    TSharedRef<STextBlock> ConstructTextBlock = SNew(STextBlock)
+    .Text(FText::FromString(TextContent))
+    .Font(FontToUse)
+    .ColorAndOpacity(FColor::White);
+
+    return ConstructTextBlock;
 }
