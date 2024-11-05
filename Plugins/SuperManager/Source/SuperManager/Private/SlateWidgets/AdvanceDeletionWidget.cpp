@@ -11,6 +11,8 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 	bCanSupportFocus = true;
 
     StoredAssetData = InArgs._AssetsDataToStore;
+    CheckBoxesArray.Empty();
+    AssetsDataToDeleteArray.Empty();
 
 	FSlateFontInfo TitleTextFont = FCoreStyle::Get().GetFontStyle(FName("EmbossedText"));
 	TitleTextFont.Size = 30;
@@ -95,6 +97,7 @@ TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionTab::ConstructAsse
 void SAdvanceDeletionTab::RefreshAssetListView()
 {
     AssetsDataToDeleteArray.Empty();
+    CheckBoxesArray.Empty();
 
     if(AssetListView.IsValid())
     {
@@ -168,6 +171,8 @@ TSharedRef<SCheckBox> SAdvanceDeletionTab::ConstructCheckBox(const TSharedPtr<FA
     .Type(ESlateCheckBoxType::CheckBox)
     .OnCheckStateChanged(this, &SAdvanceDeletionTab::OnCheckBoxStateChanged, AssetDataToDisplay)
     .Visibility(EVisibility::Visible);
+
+    CheckBoxesArray.Add(ConstructCheckBox);
 
     return ConstructCheckBox;
 }
@@ -265,7 +270,7 @@ FReply SAdvanceDeletionTab::OnDeleteAllButtonClicked()
     }
     //Pass data to out module for deletetion
     FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>(TEXT("SuperManager"));
-    
+  
     const bool bAssetDeleted = SuperManagerModule.DeleteMultipleAssetsForAssetList(AssetDataToDelete);
     if(bAssetDeleted)
     {
@@ -298,7 +303,18 @@ TSharedRef<SButton> SAdvanceDeletionTab::COnstructSelectAllButton()
 
 FReply SAdvanceDeletionTab::OnSelectAllButtonClicked()
 {
-    DebugHeader::Print(TEXT("Select All!"), FColor::Green);
+    if(CheckBoxesArray.Num() == 0)
+    {
+        return FReply::Handled();
+    }
+
+    for (const TSharedRef<SCheckBox>& CheckBox : CheckBoxesArray)
+    {
+        if(CheckBox->IsChecked()) continue;
+
+        CheckBox->ToggleCheckedState();
+    }
+
     return FReply::Handled();
 }
 
@@ -317,7 +333,18 @@ TSharedRef<SButton> SAdvanceDeletionTab::COnstructDeSelectAllButton()
 
 FReply SAdvanceDeletionTab::OnDeSelectAllButtonClicked()
 {
-    DebugHeader::Print(TEXT("DeSelect All!"), FColor::Green);
+    if( CheckBoxesArray.Num() == 0 )
+    {
+        return FReply::Handled();
+    }
+
+    for( const TSharedRef<SCheckBox>& CheckBox : CheckBoxesArray )
+    {
+        if( !CheckBox->IsChecked() ) continue;
+
+        CheckBox->ToggleCheckedState();
+    }
+
     return FReply::Handled();
 }
 
