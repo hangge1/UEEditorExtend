@@ -36,5 +36,6 @@ private:
     bool ProcessSeletedData(const TArray<FAssetData>& SeletedAssets, 
         TArray<UTexture2D*>& OutSeletedTexturesArray, FString& OutSeletedTexturesData);
 
+    bool CheckIsNameUsed(const FString& FolderPathToCheck, const FString& MaterialNameToCheck);
 #pragma endregion
 };

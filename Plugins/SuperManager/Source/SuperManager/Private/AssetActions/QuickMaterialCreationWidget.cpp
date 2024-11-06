@@ -26,6 +26,10 @@ void UQuickMaterialCreationWidget::CreateQuickMaterialFromSeletedTextures()
     if( !ProcessSeletedData(SeletedAssets, SelectedTexturesArray, SelectedTextureFolderPath) )
         return;
 
+    if(!CheckIsNameUsed(SelectedTextureFolderPath, MaterialName))
+    {
+        
+    }
     DebugHeader::Print(SelectedTextureFolderPath, FColor::Cyan);
 }
 
@@ -54,12 +58,9 @@ bool UQuickMaterialCreationWidget::ProcessSeletedData(const TArray<FAssetData>& 
         UTexture2D* SeletedTexture = Cast<UTexture2D>(SeletedAsset);
         if( !SeletedTexture )
         {
-            DebugHeader::ShowMsgDialog(EAppMsgType::Ok,
-                                       TEXT("Please select only Texture!\n" + SeletedAsset->GetName() + TEXT(" is not texture")), true);
+            DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("Please select only Texture!\n" + SeletedAsset->GetName() + TEXT(" is not texture")), true);
             continue;
         }
-
-        OutSeletedTexturesArray.Add(SeletedTexture);
 
         if( OutSeletedTexturesPackagePath.IsEmpty() )
         {
@@ -73,9 +74,29 @@ bool UQuickMaterialCreationWidget::ProcessSeletedData(const TArray<FAssetData>& 
             MaterialName.InsertAt(0, TEXT("M_"));
             bMaterialSet = true;
         }
+
+        OutSeletedTexturesArray.Add(SeletedTexture);
     }
 
     return !OutSeletedTexturesArray.IsEmpty();
+}
+
+bool UQuickMaterialCreationWidget::CheckIsNameUsed(const FString& FolderPathToCheck, const FString& MaterialNameToCheck)
+{
+    TArray<FString> ExistingAssetsPaths = UEditorAssetLibrary::ListAssets(FolderPathToCheck, false);
+
+    for (const FString& ExistingAssetPath : ExistingAssetsPaths)
+    {
+        const FString ExistingAssetName = FPaths::GetBaseFilename(ExistingAssetPath);
+        if(ExistingAssetName.Equals(MaterialNameToCheck))
+        {
+            DebugHeader::ShowMsgDialog(EAppMsgType::Ok, 
+            TEXT("This Material Name is Already!\n" + MaterialNameToCheck), true);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 #pragma endregion
