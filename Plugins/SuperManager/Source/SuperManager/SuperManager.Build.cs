@@ -27,9 +27,9 @@ public class SuperManager : ModuleRules
 			{
 				"Core","Blutility","EditorScriptingUtilities", 
                 "UMG", "Niagara", "UnrealEd", 
-                "AssetTools", "ContentBrowser", "InputCore"
-				
-			}
+                "AssetTools", "ContentBrowser", "InputCore","Projects"
+
+            }
 			);
 			
 		
