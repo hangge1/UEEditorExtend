@@ -11,6 +11,9 @@ public:
 
     static void ShutDown();
 
+public:
+    static FName GetStyleSetName() { return CustomStyleSetName;} 
+
 private:
     static FName CustomStyleSetName;
 

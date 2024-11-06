@@ -8,11 +8,14 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetToolsModule.h"
 #include "SlateWidgets/AdvanceDeletionWidget.h"
+#include "CustomStyle/SuperManagerStyle.h"
 
 #define LOCTEXT_NAMESPACE "FSuperManagerModule"
 
 void FSuperManagerModule::StartupModule()
 {
+    FSuperManagerStyle::InitializeIcons();
+
 	InitCBMenuExtention();
 
 	RegisterAdvanceDeletionTab();
@@ -21,6 +24,8 @@ void FSuperManagerModule::StartupModule()
 void FSuperManagerModule::ShutdownModule()
 {
     FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(FName("AdvanceDeletion"));
+
+    FSuperManagerStyle::ShutDown();
 }
 
 #pragma region CustomEditorTab
@@ -32,6 +37,8 @@ void FSuperManagerModule::RegisterAdvanceDeletionTab()
 		FOnSpawnTab::CreateRaw(this, &FSuperManagerModule::OnSpawnAdvanceDeletionTab)
 	);
 
+
+    TabSpawnerEntry.SetIcon(FSlateIcon(FSuperManagerStyle::GetStyleSetName(), "ContentBrowser.AdvanceDeletion"));
 	TabSpawnerEntry.SetDisplayName(FText::FromString(TEXT("Advance Deletion")));
 }
 
@@ -117,21 +124,21 @@ void FSuperManagerModule::AddCBMenuEntry(FMenuBuilder& MenuBuilder)
 	MenuBuilder.AddMenuEntry(
 		FText::FromString(TEXT("Delete Unused Assets")), //Title
 		FText::FromString(TEXT("Safely Delete All unused assets under folder")), //Tooltip
-		FSlateIcon(), //Icon
+		FSlateIcon(FSuperManagerStyle::GetStyleSetName(), "ContentBrowser.DeleteUnusedAssets"), //Icon
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteUnusedAssetButtonClicked) //actual function to execute
 	);
 
 	MenuBuilder.AddMenuEntry(
 		FText::FromString(TEXT("Delete Empty Folders")),
 		FText::FromString(TEXT("Safely Delete All Empty Folders Without Any Assets")), 
-		FSlateIcon(), //Icon
+		FSlateIcon(FSuperManagerStyle::GetStyleSetName(), "ContentBrowser.DeleteEmptyFolders"), //Icon
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteEmptyFoldersButtonClicked) 
 	);
 
 	MenuBuilder.AddMenuEntry(
 		FText::FromString(TEXT("Advance Deletetion")),
 		FText::FromString(TEXT("List assets by specific condition in a tab deleting")),
-		FSlateIcon(), //Icon
+		FSlateIcon(FSuperManagerStyle::GetStyleSetName(), "ContentBrowser.AdvanceDeletion"), //Icon
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnAdvanceDeletionButtonClicked)
 	);
 

@@ -19,18 +19,24 @@ void FSuperManagerStyle::InitializeIcons()
 
 void FSuperManagerStyle::ShutDown()
 {
-    
+    if(CreatedSlateStyleSet.IsValid())
+    {
+        FSlateStyleRegistry::UnRegisterSlateStyle(*CreatedSlateStyleSet);
+        CreatedSlateStyleSet.Reset();
+    } 
 }
 
 TSharedRef<FSlateStyleSet> FSuperManagerStyle::CreateSlateStyleSet()
 {
     TSharedRef<FSlateStyleSet> CustomStyleSet = MakeShareable<FSlateStyleSet>(new FSlateStyleSet(CustomStyleSetName));
 
-    const FString IconDir = IPluginManager::Get().FindPlugin(TEXT("SuperManager"))->GetBaseDir() /"Resources";
+    const FString IconDir = IPluginManager::Get().FindPlugin(TEXT("SuperManager"))->GetBaseDir() / "Resources";
     CustomStyleSet->SetContentRoot(IconDir);
 
     const FVector2D Icon16x16(16.f, 16.f);
     CustomStyleSet->Set("ContentBrowser.DeleteUnusedAssets", new FSlateImageBrush(IconDir/"DeleteUnusedAsset.png", Icon16x16));
+    CustomStyleSet->Set("ContentBrowser.AdvanceDeletion", new FSlateImageBrush(IconDir/"AdvanceDeletion.png", Icon16x16));
+    CustomStyleSet->Set("ContentBrowser.DeleteEmptyFolders", new FSlateImageBrush(IconDir/"DeleteEmptyFolders.png", Icon16x16));
 
 
     return CustomStyleSet;
