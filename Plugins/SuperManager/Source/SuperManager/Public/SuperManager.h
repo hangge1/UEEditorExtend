@@ -13,6 +13,7 @@ public:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 
+    
 private:
 
 #pragma region ContentBrowerMenuExtention
@@ -30,7 +31,7 @@ private:
 
 	void OnAdvanceDeletionButtonClicked();
 
-	void FixUpRedirectors();
+    void FixUpRedirectors();
 #pragma endregion
 
 #pragma region CustomEditorTab

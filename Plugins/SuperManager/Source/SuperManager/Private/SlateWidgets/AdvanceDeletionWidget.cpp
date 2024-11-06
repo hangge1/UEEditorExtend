@@ -246,6 +246,11 @@ FReply SAdvanceDeletionTab::OnDeleteButtonClicked(TSharedPtr<FAssetData> Clicked
         {
             StoredAssetData.Remove(ClickedAssetData);
 
+            if(DisplayedAssetData.Contains(ClickedAssetData))
+            {
+                DisplayedAssetData.Remove(ClickedAssetData);
+            }
+
             //Refresh the list
             RefreshAssetListView();
         }
@@ -291,6 +296,11 @@ FReply SAdvanceDeletionTab::OnDeleteAllButtonClicked()
             if(StoredAssetData.Contains(DeletedData))
             {
                 StoredAssetData.Remove(DeletedData);
+            }
+
+            if( DisplayedAssetData.Contains(DeletedData) )
+            {
+                DisplayedAssetData.Remove(DeletedData);
             }
         }
 
@@ -400,8 +410,6 @@ TSharedRef<SWidget> SAdvanceDeletionTab::OnGenerateComboContext(TSharedPtr<FStri
 
 void SAdvanceDeletionTab::OnComboxSeletionChanged(TSharedPtr<FString> SeletedOption, ESelectInfo::Type InSelectItem)
 {
-    DebugHeader::Print(*SeletedOption, FColor::Orange);
-
     ComboDisplayTextBlock->SetText(FText::FromString(*SeletedOption));
 
     FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>(TEXT("SuperManager"));
@@ -409,7 +417,8 @@ void SAdvanceDeletionTab::OnComboxSeletionChanged(TSharedPtr<FString> SeletedOpt
     if(*SeletedOption == ListAll)
     {
         //List ALL Assets
-
+        DisplayedAssetData = StoredAssetData;
+        RefreshAssetListView();
     }
     else if(*SeletedOption == ListUnused)
     {
