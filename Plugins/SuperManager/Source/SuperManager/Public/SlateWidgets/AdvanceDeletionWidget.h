@@ -56,7 +56,18 @@ private:
 
 #pragma endregion
 
+#pragma region ComboBoxForListCondition
     
+    TSharedRef<SComboBox<TSharedPtr<FString>>> ConStructComboBox();
+
+    TArray<TSharedPtr<FString>> ComboxSourceItems;
+
+    TSharedRef<SWidget> OnGenerateComboContext(TSharedPtr<FString> SourceItem);
+
+    void OnComboxSeletionChanged(TSharedPtr<FString> SeletedOption, ESelectInfo::Type InSelectItem);
+
+    TSharedPtr<STextBlock> ComboDisplayTextBlock;
+#pragma endregion   
 
     FSlateFontInfo GetEmboseedTextFont() const { return FCoreStyle::Get().GetFontStyle(FName("EmbossedText")); }
 };

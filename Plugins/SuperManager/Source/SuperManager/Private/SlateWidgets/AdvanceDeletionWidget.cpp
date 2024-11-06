@@ -6,13 +6,17 @@
 #include "DebugHeader.h"
 #include "SuperManager.h"
 
+#define ListAll TEXT("List All Available Assets")
+
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 {
 	bCanSupportFocus = true;
-
     StoredAssetData = InArgs._AssetsDataToStore;
+
     CheckBoxesArray.Empty();
     AssetsDataToDeleteArray.Empty();
+
+    ComboxSourceItems.Add(MakeShared<FString>(ListAll));
 
 	FSlateFontInfo TitleTextFont = FCoreStyle::Get().GetFontStyle(FName("EmbossedText"));
 	TitleTextFont.Size = 30;
@@ -37,6 +41,12 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 		.AutoHeight()
 		[
 			SNew(SHorizontalBox)
+
+            //ComboBox Slot
+            +SHorizontalBox::Slot()
+            [
+                ConStructComboBox()
+            ]
 		]
 
 		//Thirdslot for the asset list
@@ -362,3 +372,35 @@ TSharedRef<STextBlock> SAdvanceDeletionTab::ConstructTextForTabButtons(const FSt
 }
 
 #pragma endregion
+
+#pragma region ComboBoxForListCondition
+
+TSharedRef<SComboBox<TSharedPtr<FString>>> SAdvanceDeletionTab::ConStructComboBox()
+{
+    TSharedRef<SComboBox<TSharedPtr<FString>>> ConstructedComboBox
+    = SNew(SComboBox<TSharedPtr<FString>>)
+    .OptionsSource(&ComboxSourceItems)
+    .OnGenerateWidget(this, &SAdvanceDeletionTab::OnGenerateComboContext)
+    .OnSelectionChanged(this, &SAdvanceDeletionTab::OnComboxSeletionChanged)
+    [
+      SAssignNew(ComboDisplayTextBlock, STextBlock).Text(FText::FromString(TEXT("List All Seletc Option")))
+    ];
+
+    return ConstructedComboBox;
+}
+
+TSharedRef<SWidget> SAdvanceDeletionTab::OnGenerateComboContext(TSharedPtr<FString> SourceItem)
+{
+    TSharedRef<STextBlock> ConstructComboxRow =
+    SNew(STextBlock).Text(FText::FromString(*SourceItem.Get()));
+    return ConstructComboxRow;
+}
+
+void SAdvanceDeletionTab::OnComboxSeletionChanged(TSharedPtr<FString> SeletedOption, ESelectInfo::Type InSelectItem)
+{
+    DebugHeader::Print(*SeletedOption, FColor::Orange);
+
+    ComboDisplayTextBlock->SetText(FText::FromString(*SeletedOption));
+}
+
+#pragma endregion  
