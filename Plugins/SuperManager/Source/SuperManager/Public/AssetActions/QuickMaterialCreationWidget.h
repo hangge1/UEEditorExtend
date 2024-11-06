@@ -21,8 +21,20 @@ public:
     UFUNCTION(BlueprintCallable)
     void CreateQuickMaterialFromSeletedTextures();
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CreateMaterialFromSeletedTextures")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CreateMaterialFromSeletedTextures")
+    bool bCustomMaterialName = true;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CreateMaterialFromSeletedTextures", meta = (EditCondition = "bCustomMaterialName"))
     FString MaterialName = TEXT("M_");
+
+#pragma endregion
+
+private:
+
+#pragma region QuickMaterialCreationCore
+
+    bool ProcessSeletedData(const TArray<FAssetData>& SeletedAssets, 
+        TArray<UTexture2D*>& OutSeletedTexturesArray, FString& OutSeletedTexturesData);
 
 #pragma endregion
 };
