@@ -29,6 +29,8 @@ private:
     //Row Widget
     TSharedRef<ITableRow> OnGenerateRowForList(TSharedPtr<FAssetData> AssetDataToDisplay, const TSharedRef<STableViewBase>& OwnerTable);
 
+    void OnRowWidgetMouseButtonClicked(TSharedPtr<FAssetData> ClickData);
+
     //CheckBox in Row
     TSharedRef<SCheckBox> ConstructCheckBox(const TSharedPtr<FAssetData>& AssetDataToDisplay);
     void OnCheckBoxStateChanged(ECheckBoxState NewState, TSharedPtr<FAssetData> AssetData);
