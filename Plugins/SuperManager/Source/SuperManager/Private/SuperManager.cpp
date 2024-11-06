@@ -43,6 +43,7 @@ TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvanceDeletionTab(const FSpawn
 	[
 		SNew(SAdvanceDeletionTab)
         .AssetsDataToStore(GetAllAssetDataUnderSeletedFolder())
+        .CurrentSeletedFolder(FolderPathSelected[0])
 	];
 }
 

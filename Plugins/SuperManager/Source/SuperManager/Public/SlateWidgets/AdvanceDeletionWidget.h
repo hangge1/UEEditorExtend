@@ -8,13 +8,15 @@
 class SAdvanceDeletionTab : public SCompoundWidget
 {
 	SLATE_BEGIN_ARGS(SAdvanceDeletionTab){}
-		SLATE_ARGUMENT(TArray<TSharedPtr<FAssetData>>, AssetsDataToStore);
+        SLATE_ARGUMENT(TArray<TSharedPtr<FAssetData>>, AssetsDataToStore);
+        SLATE_ARGUMENT(FString, CurrentSeletedFolder);
 	SLATE_END_ARGS()
 
 public:
 	void Construct(const FArguments& InArgs);
 
 private:
+    FString CurrentSeletedFolderPath;
     TArray< TSharedPtr<FAssetData> > StoredAssetData;
     TArray< TSharedPtr<FAssetData> > DisplayedAssetData;
     TArray< TSharedPtr<FAssetData> > AssetsDataToDeleteArray;
@@ -70,6 +72,8 @@ private:
     void OnComboxSeletionChanged(TSharedPtr<FString> SeletedOption, ESelectInfo::Type InSelectItem);
 
     TSharedPtr<STextBlock> ComboDisplayTextBlock;
+
+    TSharedRef<STextBlock> ConstructComboHelpTexts(const FString& TextContent, ETextJustify::Type Justify);
 #pragma endregion   
 
     FSlateFontInfo GetEmboseedTextFont() const { return FCoreStyle::Get().GetFontStyle(FName("EmbossedText")); }

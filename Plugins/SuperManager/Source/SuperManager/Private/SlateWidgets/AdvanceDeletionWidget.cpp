@@ -14,6 +14,7 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 {
 	bCanSupportFocus = true;
     StoredAssetData = InArgs._AssetsDataToStore;
+    CurrentSeletedFolderPath = InArgs._CurrentSeletedFolder;
     DisplayedAssetData = StoredAssetData;
 
     CheckBoxesArray.Empty();
@@ -51,8 +52,24 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 
             //ComboBox Slot
             +SHorizontalBox::Slot()
+            .AutoWidth()
             [
                 ConStructComboBox()
+            ]
+
+            //Help Text for combo box slot
+            +SHorizontalBox::Slot()
+            .FillWidth(.6f).VAlign(EVerticalAlignment::VAlign_Center)
+            [
+                ConstructComboHelpTexts(TEXT("Specify the listing condition in the drop down. Left mouse click can sync to content browser!"),
+                                        ETextJustify::Center)
+            ]
+
+            //Help Text for folder path
+            + SHorizontalBox::Slot()
+            .FillWidth(.1f)
+            [
+                ConstructComboHelpTexts(TEXT("Current Folder:\n") + CurrentSeletedFolderPath, ETextJustify::Right)
             ]
 		]
 
@@ -443,6 +460,17 @@ void SAdvanceDeletionTab::OnComboxSeletionChanged(TSharedPtr<FString> SeletedOpt
         SuperManagerModule.ListSameNameAssetsForAssetList(StoredAssetData, DisplayedAssetData);
         RefreshAssetListView();
     }
+}
+
+TSharedRef<STextBlock> SAdvanceDeletionTab::ConstructComboHelpTexts(const FString& TextContent, ETextJustify::Type Justify)
+{
+    TSharedRef<STextBlock> HelpTextBlock =
+    SNew(STextBlock)
+    .Text(FText::FromString(TextContent))
+    .Justification(Justify)
+    .AutoWrapText(true);
+
+    return HelpTextBlock;
 }
 
 #pragma endregion  
