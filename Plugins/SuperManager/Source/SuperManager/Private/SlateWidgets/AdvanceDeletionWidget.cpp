@@ -8,6 +8,7 @@
 
 #define ListAll TEXT("List All Available Assets")
 #define ListUnused TEXT("List Unused Assets")
+#define ListSameName TEXT("List Same Name Assets")
 
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 {
@@ -20,6 +21,7 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 
     ComboxSourceItems.Add(MakeShared<FString>(ListAll));
     ComboxSourceItems.Add(MakeShared<FString>(ListUnused));
+    ComboxSourceItems.Add(MakeShared<FString>(ListSameName));
 
 
 	FSlateFontInfo TitleTextFont = FCoreStyle::Get().GetFontStyle(FName("EmbossedText"));
@@ -395,7 +397,7 @@ TSharedRef<SComboBox<TSharedPtr<FString>>> SAdvanceDeletionTab::ConStructComboBo
     .OnGenerateWidget(this, &SAdvanceDeletionTab::OnGenerateComboContext)
     .OnSelectionChanged(this, &SAdvanceDeletionTab::OnComboxSeletionChanged)
     [
-      SAssignNew(ComboDisplayTextBlock, STextBlock).Text(FText::FromString(TEXT("List All Seletc Option")))
+      SAssignNew(ComboDisplayTextBlock, STextBlock).Text(FText::FromString(ListAll))
     ];
 
     return ConstructedComboBox;
@@ -426,7 +428,12 @@ void SAdvanceDeletionTab::OnComboxSeletionChanged(TSharedPtr<FString> SeletedOpt
         SuperManagerModule.ListUnusedAssetsForAssetList(StoredAssetData, DisplayedAssetData);
         RefreshAssetListView();
     }
-
+    else if(*SeletedOption == ListSameName)
+    {
+        //List Same Name Assets
+        SuperManagerModule.ListSameNameAssetsForAssetList(StoredAssetData, DisplayedAssetData);
+        RefreshAssetListView();
+    }
 }
 
 #pragma endregion  

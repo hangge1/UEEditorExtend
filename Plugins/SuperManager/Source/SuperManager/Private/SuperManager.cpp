@@ -328,6 +328,34 @@ void FSuperManagerModule::ListUnusedAssetsForAssetList(const TArray<TSharedPtr<F
     }
 }
 
+void FSuperManagerModule::ListSameNameAssetsForAssetList(const TArray<TSharedPtr<FAssetData>>& AssetsDataToFilter, 
+    TArray<TSharedPtr<FAssetData>>& OutUnusedAssetsData)
+{
+    OutUnusedAssetsData.Empty();
+
+    TMultiMap<FString, TSharedPtr<FAssetData>> AssetsHelperMap;
+    for( const TSharedPtr<FAssetData>& AssetData : AssetsDataToFilter )
+    {
+        AssetsHelperMap.Emplace(AssetData->AssetName.ToString(), AssetData);
+    }
+
+    for( const TSharedPtr<FAssetData>& AssetData : AssetsDataToFilter )
+    {
+        TArray<TSharedPtr<FAssetData>> OutAssetDatas;
+        AssetsHelperMap.MultiFind(AssetData->AssetName.ToString(), OutAssetDatas);
+
+        if(OutAssetDatas.Num() <= 1) continue;
+
+        for (const TSharedPtr<FAssetData>& Data : OutAssetDatas)
+        {
+            if(Data.IsValid())
+            {
+                OutUnusedAssetsData.AddUnique(Data);
+            }
+        }
+    }
+}
+
 #pragma endregion
 
 #undef LOCTEXT_NAMESPACE

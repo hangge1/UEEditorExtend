@@ -54,6 +54,9 @@ public:
     void ListUnusedAssetsForAssetList(const TArray<TSharedPtr<FAssetData>>& AssetsDataToFilter, 
         TArray<TSharedPtr<FAssetData>>& OutUnusedAssetsData);
 
+
+    void ListSameNameAssetsForAssetList(const TArray<TSharedPtr<FAssetData>>& AssetsDataToFilter, 
+        TArray<TSharedPtr<FAssetData>>& OutUnusedAssetsData);
 #pragma endregion
 
 };
