@@ -76,9 +76,11 @@ private:
     void Default_CreateMaterialNodes(UMaterial* CreatedMaterial, UTexture2D* SelectedTexture, uint32& PinsConnectedCounter);
 #pragma endregion
 
-#pragma region CreateMaterialNodes
+#pragma region CreateMaterialNodesConnectPins
 
-    bool TryConnectBaseColor(UMaterialExpressionTextureSample* TextureSample, UMaterial* TargetMaterial, UTexture2D* SelectedTexture);
+    bool TryConnectBaseColor(UMaterialExpressionTextureSample* TextureSampleNode, UMaterial* CreatedMaterial, UTexture2D* SelectedTexture);
+
+    bool TryConnectMetalic(UMaterialExpressionTextureSample* TextureSampleNode, UMaterial* CreatedMaterial, UTexture2D* SelectedTexture);
 
 #pragma endregion
 };
