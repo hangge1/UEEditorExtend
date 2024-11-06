@@ -7,16 +7,20 @@
 #include "SuperManager.h"
 
 #define ListAll TEXT("List All Available Assets")
+#define ListUnused TEXT("List Unused Assets")
 
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 {
 	bCanSupportFocus = true;
     StoredAssetData = InArgs._AssetsDataToStore;
+    DisplayedAssetData = StoredAssetData;
 
     CheckBoxesArray.Empty();
     AssetsDataToDeleteArray.Empty();
 
     ComboxSourceItems.Add(MakeShared<FString>(ListAll));
+    ComboxSourceItems.Add(MakeShared<FString>(ListUnused));
+
 
 	FSlateFontInfo TitleTextFont = FCoreStyle::Get().GetFontStyle(FName("EmbossedText"));
 	TitleTextFont.Size = 30;
@@ -98,7 +102,7 @@ TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionTab::ConstructAsse
 {
     AssetListView = SNew(SListView<TSharedPtr<FAssetData>>)
         .ItemHeight(24.f)
-        .ListItemsSource(&StoredAssetData)
+        .ListItemsSource(&DisplayedAssetData)
         .OnGenerateRow(this, &SAdvanceDeletionTab::OnGenerateRowForList);
 
     return AssetListView.ToSharedRef();
@@ -192,11 +196,9 @@ void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TShare
     switch (NewState)
     {
     case ECheckBoxState::Checked:
-        DebugHeader::Print(AssetData->AssetName.ToString() + TEXT("Is Checked"), FColor::Blue);
         AssetsDataToDeleteArray.AddUnique(AssetData);
         break;
     case ECheckBoxState::Unchecked:
-        DebugHeader::Print(AssetData->AssetName.ToString() + TEXT("Is Unchecked"), FColor::Blue);
         if(AssetsDataToDeleteArray.Contains(AssetData))
         {
             AssetsDataToDeleteArray.Remove(AssetData);
@@ -204,7 +206,7 @@ void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TShare
         break;
     case ECheckBoxState::Undetermined:
         DebugHeader::Print(AssetData->AssetName.ToString() + TEXT("Is Undetermined"), FColor::Blue);
-        break;
+        checkNoEntry();
     default:
         break;
     }
@@ -401,6 +403,21 @@ void SAdvanceDeletionTab::OnComboxSeletionChanged(TSharedPtr<FString> SeletedOpt
     DebugHeader::Print(*SeletedOption, FColor::Orange);
 
     ComboDisplayTextBlock->SetText(FText::FromString(*SeletedOption));
+
+    FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>(TEXT("SuperManager"));
+
+    if(*SeletedOption == ListAll)
+    {
+        //List ALL Assets
+
+    }
+    else if(*SeletedOption == ListUnused)
+    {
+        //List UnUsed Assets
+        SuperManagerModule.ListUnusedAssetsForAssetList(StoredAssetData, DisplayedAssetData);
+        RefreshAssetListView();
+    }
+
 }
 
 #pragma endregion  
