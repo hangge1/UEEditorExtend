@@ -14,4 +14,15 @@ class SUPERMANAGER_API UQuickMaterialCreationWidget : public UEditorUtilityWidge
 {
 	GENERATED_BODY()
 	
+public:
+    
+#pragma region QuickMaterialCreationCore
+
+    UFUNCTION(BlueprintCallable)
+    void CreateQuickMaterialFromSeletedTextures();
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CreateMaterialFromSeletedTextures")
+    FString MaterialName = TEXT("M_");
+
+#pragma endregion
 };
