@@ -7,6 +7,7 @@
 #include "EditorUtilityLibrary.h"
 #include "AssetToolsModule.h"
 #include "Factories/MaterialFactoryNew.h"
+#include "Materials/MaterialExpressionTextureSample.h"
 
 #pragma region QuickMaterialCreationCore
 
@@ -37,6 +38,14 @@ void UQuickMaterialCreationWidget::CreateQuickMaterialFromSeletedTextures()
     {
         DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("Failed to create material!"));
         return;
+    }
+
+    uint32 PinsConnectedCounter = 0;
+    for (UTexture2D* SelectTexture : SelectedTexturesArray)
+    {
+        if(!SelectTexture) continue;
+
+        Default_CreateMaterialNodes(CreatedMaterial, SelectTexture, PinsConnectedCounter);
     }
 }
 
@@ -117,6 +126,48 @@ UMaterial* UQuickMaterialCreationWidget::CreateMaterialAsset(const FString& Name
         UMaterial::StaticClass(), MaterialFactory);
 
     return Cast<UMaterial>(CreatedObject);
+}
+
+void UQuickMaterialCreationWidget::Default_CreateMaterialNodes(UMaterial* CreatedMaterial, UTexture2D* SelectedTexture, uint32& PinsConnectedCounter)
+{
+    UMaterialExpressionTextureSample* TextureSampleNode = NewObject<UMaterialExpressionTextureSample>(CreatedMaterial);
+    if(!TextureSampleNode) return;
+
+    if(!CreatedMaterial->HasBaseColorConnected())
+    {
+        if(TryConnectBaseColor(TextureSampleNode, CreatedMaterial, SelectedTexture))
+        {
+            PinsConnectedCounter++;
+            return;
+        }
+    }
+}
+
+#pragma endregion
+
+#pragma region CreateMaterialNodes
+
+bool UQuickMaterialCreationWidget::TryConnectBaseColor(UMaterialExpressionTextureSample* TextureSampleNode, 
+    UMaterial* CreatedMaterial, UTexture2D* SelectedTexture)
+{
+    for(const FString& BaseColorName : BaseColorArray)
+    {
+        if(SelectedTexture->GetName().Contains(BaseColorName))
+        {
+            //Connect pins to base color socket here
+            TextureSampleNode->Texture = SelectedTexture;
+
+            CreatedMaterial->GetExpressionCollection().AddExpression(TextureSampleNode);
+            CreatedMaterial->GetExpressionInputForProperty(MP_BaseColor)->Expression = TextureSampleNode;
+            CreatedMaterial->PostEditChange();
+
+            TextureSampleNode->MaterialExpressionEditorX -= 600;
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 #pragma endregion
